@@ -1,0 +1,5 @@
+Resumen de Credenciales para Pruebas:
+NATURGY BAN CAU: operador_bancau / BanCau2026!
+NATURGY NOA CAU: operador_noacau / NoaCau2026!
+NATURGY ENERGIA SAN JUAN: operador_sanjuan / SanJuan2026!
+Líderes (Gestión total): kparra / admin2026 o lherrera / admin2026

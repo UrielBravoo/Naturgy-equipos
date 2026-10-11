@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Gestión - Naturgy & Cat Technologies</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <!-- Cabecera institucional con fondo NEGRO y los logos balanceados -->
+    <header class="main-header">
+        <div class="logos-container">
+            <div class="logo-box">
+                <img src="cat.png" alt="Cat Technologies" class="logo-img">
+            </div>
+            <div class="logo-box">
+                <img src="naturgy.png" alt="Naturgy" class="logo-img">
+            </div>
+        </div>
+        <h1>Portal de Control de Asistencias y Turnos</h1>
+        <p>Seleccione su equipo de trabajo para acceder a los reportes</p>
+    </header>
+
+    <!-- Contenedor de las 3 tarjetas de Equipos -->
+    <main class="equipos-grid">
+        <div class="card-equipo" onclick="abrirLogin('EQUIPO NATURGY BAN')">
+            <h2>EQUIPO NATURGY BAN</h2>
+            <p>Acceso a reportes, control de tiempos y nómina.</p>
+            <button>Ingresar</button>
+        </div>
+
+        <div class="card-equipo" onclick="abrirLogin('EQUIPO NATURGY NOA')">
+            <h2>EQUIPO NATURGY NOA</h2>
+            <p>Acceso a reportes, control de tiempos y nómina.</p>
+            <button>Ingresar</button>
+        </div>
+
+        <div class="card-equipo" onclick="abrirLogin('EQUIPO NATURGY ENERGIA SAN JUAN')">
+            <h2>EQUIPO NATURGY ENERGÍA SAN JUAN</h2>
+            <p>Acceso a reportes, control de tiempos y nómina.</p>
+            <button>Ingresar</button>
+        </div>
+    </main>
+
+    <!-- Ventana emergente (Modal) para Usuario y Contraseña -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarLogin()">&times;</span>
+            <h3 id="modalTitle">Acceso al Equipo</h3>
+            <form onsubmit="validarAcceso(event)">
+                <label for="usuario">Usuario:</label>
+                <input type="text" id="usuario" required placeholder="Ej: operador o lider">
+
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" required placeholder="••••••••">
+
+                <button type="submit" class="btn-ingresar">Entrar al Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

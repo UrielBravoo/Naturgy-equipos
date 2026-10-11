@@ -1,0 +1,20 @@
+let equipoSeleccionado = "";
+
+function abrirLogin(nombreEquipo) {
+    equipoSeleccionado = nombreEquipo;
+    document.getElementById("modalTitle").innerText = "Acceso a " + nombreEquipo;
+    document.getElementById("loginModal").style.display = "block";
+}
+
+function cerrarLogin() {
+    document.getElementById("loginModal").style.display = "none";
+}
+
+function validarAcceso(event) {
+    event.preventDefault();
+    const usuario = document.getElementById("usuario").value;
+    const pass = document.getElementById("password").value;
+
+    // Aquí validaremos los roles más adelante
+    alert("Acceso concedido a: " + equipoSeleccionado);
+    cerrarLogin();

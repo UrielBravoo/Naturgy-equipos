@@ -1,0 +1,19 @@
+import pandas as pd
+
+def procesar_logueos_orion(ruta_archivo):
+    print("Leyendo el reporte de asistencia...")
+    
+    # Leemos la solapa 'OCTUBRE' de tu archivo de Orion
+    df = pd.read_excel(ruta_archivo, sheet_name='OCTUBRE')
+    
+    print(f"Archivo cargado con éxito. Total de filas: {len(df)}")
+    
+    # Aquí iremos agregando la lógica específica para extraer 
+    # las horas de entrada, salida y detectar las 'F' de faltas por asesor.
+    return df
+
+if __name__ == "__main__":
+    # Coloca aquí el nombre exacto de tu archivo Excel descargado (ej. "reporte.xlsx")
+    # archivo = "Logueos Naturgy BAN CAU SEPT-OCT.xlsx"
+    # procesar_logueos_orion(archivo)
+    pass
