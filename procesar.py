@@ -1,20 +1,22 @@
 import pandas as pd
 
 def procesar_reporte_asistencias(ruta_archivo):
-    print("Iniciando procesamiento del reporte...")
+    print("Iniciando procesamiento del reporte de Orion...")
     
-    # Leemos la solapa 'OCTUBRE' de tu planilla de control
+    # 1. Leemos la solapa 'OCTUBRE' (puedes cambiarla por 'Control Tiempos' si prefieres)
     df = pd.read_excel(ruta_archivo, sheet_name='OCTUBRE')
     
-    # Mostramos las primeras filas para verificar columnas clave (Legajo, Asesor, Turno)
-    print("Datos cargados correctamente.")
+    # 2. Mostramos las primeras filas en la terminal para verificar que leyó bien
+    print(f"Total de filas leídas: {len(df)}")
     
-    # Ejemplo de filtrado básico por equipos o turnos
-    # Aquí puedes estructurar la lógica para calcular totales y desvíos
+    # 3. Aquí puedes agregar la lógica para filtrar o limpiar datos
+    # Por ejemplo, si quieres ver las columnas disponibles:
+    print("Columnas encontradas en el reporte:", df.columns)
+    
     return df
 
 if __name__ == "__main__":
-    # Coloca aquí la ruta de tu archivo de prueba local cuando lo descargues
-    # archivo_prueba = "Logueos_Naturgy_Test.xlsx"
+    # Cambia 'tu_archivo.xlsx' por el nombre real del archivo que descargues de Orion
+    # archivo_prueba = "tu_archivo.xlsx"
     # procesar_reporte_asistencias(archivo_prueba)
     pass
