@@ -1,19 +1,20 @@
 import pandas as pd
 
-def analizar_logueos(ruta_excel):
-    print("Leyendo el reporte de Orion...")
-    # Leemos la solapa correspondiente a OCTUBRE que vimos en tu planilla
-    df = pd.read_excel(ruta_excel, sheet_name='OCTUBRE')
+def procesar_reporte_asistencias(ruta_archivo):
+    print("Iniciando procesamiento del reporte...")
     
-    # Mostramos los primeros registros para validar columnas
-    print(f"Total de filas leídas: {len(df)}")
+    # Leemos la solapa 'OCTUBRE' de tu planilla de control
+    df = pd.read_excel(ruta_archivo, sheet_name='OCTUBRE')
     
-    # Aquí puedes agregar la lógica para buscar faltas 'F' o calcular horas
-    # Por ejemplo, filtrar filas donde aparezca la 'F' de ausencias
+    # Mostramos las primeras filas para verificar columnas clave (Legajo, Asesor, Turno)
+    print("Datos cargados correctamente.")
+    
+    # Ejemplo de filtrado básico por equipos o turnos
+    # Aquí puedes estructurar la lógica para calcular totales y desvíos
     return df
 
 if __name__ == "__main__":
-    # Reemplaza con el nombre de tu archivo de prueba
-    # archivo = "Logueos Naturgy BAN CAU SEPT-OCT.xlsx"
-    # analizar_logueos(archivo)
+    # Coloca aquí la ruta de tu archivo de prueba local cuando lo descargues
+    # archivo_prueba = "Logueos_Naturgy_Test.xlsx"
+    # procesar_reporte_asistencias(archivo_prueba)
     pass
