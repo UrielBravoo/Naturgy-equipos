@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Logueos y Asistencia - CAT</title>
     
-    <!-- Importación de tipografía Josefin Sans -->
+    <!-- Tipografía Josefin Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Hoja de estilos vinculada mediante Flask -->
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Hoja de estilos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -24,78 +27,251 @@
     <main class="container">
         <!-- Selección de Equipos (3 Campañas) -->
         <section id="equipo-section" class="equipos-grid">
-            <!-- 1. NATURGY BAN CAU -->
             <div class="card-equipo" onclick="abrirLogin('NATURGY BAN CAU')">
                 <h2>NATURGY BAN CAU</h2>
-                <p>Acceso para Operadores y Líderes</p>
-                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY BAN CAU');">INGRESAR</button>
+                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY BAN CAU');">
+                    <i class="fa-solid fa-right-to-bracket"></i> INGRESAR
+                </button>
             </div>
 
-            <!-- 2. NATURGY ENERGIA SAN JUAN -->
             <div class="card-equipo" onclick="abrirLogin('NATURGY ENERGIA SAN JUAN')">
                 <h2>NATURGY ENERGIA SAN JUAN</h2>
-                <p>Acceso para Operadores y Líderes</p>
-                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY ENERGIA SAN JUAN');">INGRESAR</button>
+                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY ENERGIA SAN JUAN');">
+                    <i class="fa-solid fa-right-to-bracket"></i> INGRESAR
+                </button>
             </div>
 
-            <!-- 3. NATURGY NOA CAU -->
             <div class="card-equipo" onclick="abrirLogin('NATURGY NOA CAU')">
                 <h2>NATURGY NOA CAU</h2>
-                <p>Acceso para Operadores y Líderes</p>
-                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY NOA CAU');">INGRESAR</button>
+                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY NOA CAU');">
+                    <i class="fa-solid fa-right-to-bracket"></i> INGRESAR
+                </button>
             </div>
         </section>
 
         <!-- Dashboard Post-Login -->
         <section id="dashboard-section" style="display: none;">
             <div class="user-bar">
-                <p>Usuario: <strong id="user-display"></strong> | Rol: <span id="role-display" class="badge"></span></p>
-                <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
+                <p><i class="fa-solid fa-user-circle"></i> Usuario: <strong id="user-display"></strong> | Rol: <span id="role-display" class="badge"></span></p>
+                <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</button>
             </div>
 
-            <!-- Menú de Pestañas (Info abre primero) -->
+            <!-- Menú de Pestañas Principal -->
             <nav class="team-navigation">
-                <button type="button" id="tab-btn-info" class="nav-tab active" onclick="showTab('info')">📢 Info <span id="team-info-label">Equipo</span></button>
-                <button type="button" id="tab-btn-logueos" class="nav-tab" onclick="showTab('logueos')">📊 Reporte Logueos</button>
+                <button type="button" id="tab-btn-info" class="nav-tab active" onclick="showTab('info')">
+                    <i class="fa-solid fa-bullhorn"></i> Info <span id="team-info-label">Equipo</span>
+                </button>
+                <button type="button" id="tab-btn-nomina" class="nav-tab" onclick="showTab('nomina')" style="display: none;">
+                    <i class="fa-solid fa-users-gear"></i> Nómina
+                </button>
+                <button type="button" id="tab-btn-novedades" class="nav-tab" onclick="showTab('novedades')">
+                    <i class="fa-solid fa-bell-concierge"></i> Novedades
+                </button>
+                <button type="button" id="tab-btn-logueos" class="nav-tab" onclick="showTab('logueos')">
+                    <i class="fa-solid fa-chart-user"></i> Logueos
+                </button>
+                <button type="button" id="tab-btn-calidad" class="nav-tab" onclick="showTab('calidad')">
+                    <i class="fa-solid fa-award"></i> Calidad
+                </button>
+                <button type="button" id="tab-btn-tmo" class="nav-tab" onclick="showTab('tmo')">
+                    <i class="fa-solid fa-stopwatch"></i> TMO
+                </button>
             </nav>
 
-            <!-- Pestaña 1: Info / Presentación por Campaña -->
+            <!-- Pestaña 1: Info -->
             <div id="tab-info" class="tab-content">
                 <div class="panel-box">
-                    <h3 id="info-title-header">Información y Novedades</h3>
+                    <h3 id="info-title-header"><i class="fa-solid fa-circle-info"></i> Información y Novedades</h3>
                     
-                    <!-- Presentación BAN CAU -->
                     <div id="ppt-bancau" class="ppt-viewer team-ppt" style="display: none;">
                         <iframe loading="lazy" src="https://www.canva.com/design/DAHXvwwRNs8/HhYMcTWKdey1NQEEBDMCsA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
                     </div>
 
-                    <!-- Presentación SAN JUAN -->
                     <div id="ppt-sanjuan" class="ppt-viewer team-ppt" style="display: none;">
                         <iframe loading="lazy" src="https://www.canva.com/design/DAHXwZUnr0k/JvD_ZzvuYPamtZx-xmNVXA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
                     </div>
 
-                    <!-- Presentación NOA CAU -->
                     <div id="ppt-noacau" class="ppt-viewer team-ppt" style="display: none;">
                         <iframe loading="lazy" src="https://www.canva.com/design/DAHXwQ2dCFQ/tFmXhbv0Zhq2woI_AlnmkA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
                     </div>
                 </div>
             </div>
 
-            <!-- Pestaña 2: Logueos de Asistencia -->
-            <div id="tab-logueos" class="tab-content" style="display: none;">
-                <!-- Panel exclusivo de carga (SOLO VISIBLE PARA LÍDERES) -->
-                <div id="leader-panel" style="display: none;" class="panel-box">
-                    <h3>Cargar Nuevo Reporte de Logueos (Orion / Excel)</h3>
+            <!-- Pestaña 2: Nómina -->
+            <div id="tab-nomina" class="tab-content" style="display: none;">
+                <div class="panel-box">
+                    <h3><i class="fa-solid fa-address-card"></i> Nómina Asesores BAN CAU</h3>
+                    <div class="ppt-viewer">
+                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXwXa6qco/DngI62F7ebdBQTboxVj9_A/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 3: Novedades -->
+            <div id="tab-novedades" class="tab-content" style="display: none;">
+                <div class="filter-bar panel-box">
+                    <label for="select-periodo-novedades"><i class="fa-solid fa-calendar-days"></i> Seleccionar Período:</label>
+                    <select id="select-periodo-novedades" onchange="cambiarPeriodoNovedades(this.value)">
+                        <option value="sept-oct">Septiembre - Octubre</option>
+                        <option value="oct-nov">Octubre - Noviembre</option>
+                        <option value="nov-dic">Noviembre - Diciembre</option>
+                    </select>
+                </div>
+
+                <div id="leader-panel-novedades" style="display: none;" class="panel-box leader-panel">
+                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de Novedades (Excel)</h3>
                     <div class="upload-group">
-                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
-                        <button type="button" onclick="subirArchivo()" class="btn-ingresar">Subir y Procesar Archivo</button>
+                        <input type="file" id="excelFileNovedades" accept=".xlsx, .xls, .csv">
+                        <button type="button" onclick="subirArchivo('novedades')" class="btn-ingresar">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
+                        </button>
                     </div>
                 </div>
 
-                <div id="data-panel" class="panel-box">
-                    <h3>Reporte Activo de Logueos</h3>
-                    <div id="table-container" class="table-responsive">
-                        <p>Cargando registros del equipo...</p>
+                <div class="panel-box">
+                    <h3><i class="fa-solid fa-table-list"></i> Reporte de Novedades</h3>
+                    <div id="table-container-novedades" class="table-responsive">
+                        <p>Cargando registros de novedades para el período seleccionado...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 4: Logueos -->
+            <div id="tab-logueos" class="tab-content" style="display: none;">
+                <div class="filter-bar panel-box">
+                    <label for="select-mes-logueos"><i class="fa-solid fa-calendar-check"></i> Seleccionar Mes:</label>
+                    <select id="select-mes-logueos" onchange="cambiarMes('logueos', this.value)">
+                        <option value="2026-10">Octubre 2026</option>
+                        <option value="2026-11">Noviembre 2026</option>
+                        <option value="2026-12">Diciembre 2026</option>
+                    </select>
+                </div>
+
+                <div id="leader-panel-logueos" style="display: none;" class="panel-box leader-panel">
+                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de Logueos (Orion / Excel)</h3>
+                    <div class="upload-group">
+                        <input type="file" id="excelFileLogueos" accept=".xlsx, .xls, .csv">
+                        <button type="button" onclick="subirArchivo('logueos')" class="btn-ingresar">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <h3><i class="fa-solid fa-clipboard-user"></i> Reporte de Logueos</h3>
+                    <div id="table-container-logueos" class="table-responsive">
+                        <p>Cargando registros del mes seleccionado...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 5: Calidad -->
+            <div id="tab-calidad" class="tab-content" style="display: none;">
+                <div class="filter-bar panel-box">
+                    <label for="select-mes-calidad"><i class="fa-solid fa-calendar-check"></i> Seleccionar Mes:</label>
+                    <select id="select-mes-calidad" onchange="cambiarMes('calidad', this.value)">
+                        <option value="2026-10">Octubre 2026</option>
+                        <option value="2026-11">Noviembre 2026</option>
+                        <option value="2026-12">Diciembre 2026</option>
+                    </select>
+                </div>
+
+                <div class="subnav-container">
+                    <button type="button" id="subtab-btn-glosario" class="subnav-tab active" onclick="showSubTab('calidad', 'glosario')">
+                        <i class="fa-solid fa-spell-check"></i> Glosario
+                    </button>
+                    <button type="button" id="subtab-btn-monitoreos" class="subnav-tab" onclick="showSubTab('calidad', 'monitoreos')">
+                        <i class="fa-solid fa-headset"></i> Detalle Monitoreos
+                    </button>
+                    <button type="button" id="subtab-btn-resumen" class="subnav-tab" onclick="showSubTab('calidad', 'resumen')">
+                        <i class="fa-solid fa-square-poll-vertical"></i> Resumen
+                    </button>
+                </div>
+
+                <div id="leader-panel-calidad" style="display: none;" class="panel-box leader-panel">
+                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de Calidad (Excel)</h3>
+                    <div class="upload-group">
+                        <input type="file" id="excelFileCalidad" accept=".xlsx, .xls, .csv">
+                        <button type="button" onclick="subirArchivo('calidad')" class="btn-ingresar">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subtab-calidad-glosario" class="subtab-content panel-box">
+                    <h3><i class="fa-solid fa-book-bookmark"></i> Glosario de Calidad</h3>
+                    <div id="table-container-calidad-glosario" class="table-responsive">
+                        <p>Información de glosario y términos de calidad...</p>
+                    </div>
+                </div>
+
+                <div id="subtab-calidad-monitoreos" class="subtab-content panel-box" style="display: none;">
+                    <h3><i class="fa-solid fa-list-check"></i> Detalle de Monitoreos</h3>
+                    <div id="table-container-calidad-monitoreos" class="table-responsive">
+                        <p>Cargando monitoreos detallados del mes...</p>
+                    </div>
+                </div>
+
+                <div id="subtab-calidad-resumen" class="subtab-content panel-box" style="display: none;">
+                    <h3><i class="fa-solid fa-chart-line"></i> Resumen de Calidad</h3>
+                    <div id="table-container-calidad-resumen" class="table-responsive">
+                        <p>Cargando métricas de resumen...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 6: TMO -->
+            <div id="tab-tmo" class="tab-content" style="display: none;">
+                <div class="filter-bar panel-box">
+                    <label for="select-mes-tmo"><i class="fa-solid fa-calendar-check"></i> Seleccionar Mes:</label>
+                    <select id="select-mes-tmo" onchange="cambiarMes('tmo', this.value)">
+                        <option value="2026-10">Octubre 2026</option>
+                        <option value="2026-11">Noviembre 2026</option>
+                        <option value="2026-12">Diciembre 2026</option>
+                    </select>
+                </div>
+
+                <!-- Subpestañas TMO con el mismo estilo de Calidad -->
+                <div class="subnav-container">
+                    <button type="button" id="subtab-btn-tmo-general" class="subnav-tab active" onclick="showSubTab('tmo', 'general')">
+                        <i class="fa-solid fa-clock"></i> General TMO
+                    </button>
+                    <button type="button" id="subtab-btn-tmo-metricas" class="subnav-tab" onclick="showSubTab('tmo', 'metricas')">
+                        <i class="fa-solid fa-chart-column"></i> Métricas por Asesor
+                    </button>
+                    <button type="button" id="subtab-btn-tmo-detalle" class="subnav-tab" onclick="showSubTab('tmo', 'detalle')">
+                        <i class="fa-solid fa-list-ol"></i> Detalle de Llamadas
+                    </button>
+                </div>
+
+                <div id="leader-panel-tmo" style="display: none;" class="panel-box leader-panel">
+                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de TMO (Excel)</h3>
+                    <div class="upload-group">
+                        <input type="file" id="excelFileTmo" accept=".xlsx, .xls, .csv">
+                        <button type="button" onclick="subirArchivo('tmo')" class="btn-ingresar">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subtab-tmo-general" class="subtab-content panel-box">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Reporte General de TMO</h3>
+                    <div id="table-container-tmo-general" class="table-responsive">
+                        <p>Cargando registros generales de TMO...</p>
+                    </div>
+                </div>
+
+                <div id="subtab-tmo-metricas" class="subtab-content panel-box" style="display: none;">
+                    <h3><i class="fa-solid fa-users-viewfinder"></i> Métricas de TMO por Asesor</h3>
+                    <div id="table-container-tmo-metricas" class="table-responsive">
+                        <p>Cargando métricas del equipo...</p>
+                    </div>
+                </div>
+
+                <div id="subtab-tmo-detalle" class="subtab-content panel-box" style="display: none;">
+                    <h3><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Detalle de Llamadas TMO</h3>
+                    <div id="table-container-tmo-detalle" class="table-responsive">
+                        <p>Cargando detalle de llamadas...</p>
                     </div>
                 </div>
             </div>
@@ -106,7 +282,7 @@
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="cerrarLogin()">&times;</span>
-            <h2 id="modalTitle">Acceso a Equipo</h2>
+            <h2 id="modalTitle"><i class="fa-solid fa-shield-halved"></i> Acceso a Equipo</h2>
             <form onsubmit="validarAcceso(event)">
                 <label for="usuario">Usuario:</label>
                 <input type="text" id="usuario" placeholder="Ej: operador_bancau / kparra" required autocomplete="off">
@@ -114,12 +290,13 @@
                 <label for="password">Contraseña:</label>
                 <input type="password" id="password" required>
 
-                <button type="submit" class="btn-ingresar">Iniciar Sesión</button>
+                <button type="submit" class="btn-ingresar">
+                    <i class="fa-solid fa-key"></i> Iniciar Sesión
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- Script JS con versión forzada -->
-    <script src="{{ url_for('static', filename='main.js') }}?v=7.0"></script>
+    <script src="{{ url_for('static', filename='main.js') }}?v=12.0"></script>
 </body>
 </html>

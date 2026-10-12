@@ -1,11 +1,12 @@
 let equipoSeleccionado = "";
+let rolUsuario = "";
 
 function abrirLogin(nombreEquipo) {
     equipoSeleccionado = nombreEquipo;
     const modalTitle = document.getElementById("modalTitle");
     const loginModal = document.getElementById("loginModal");
     
-    if (modalTitle) modalTitle.innerText = "Acceso a " + nombreEquipo;
+    if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Acceso a ' + nombreEquipo;
     if (loginModal) loginModal.style.display = "block";
     
     setTimeout(() => {
@@ -46,26 +47,26 @@ function validarAcceso(event) {
         if (data.success) {
             cerrarLogin();
 
+            rolUsuario = data.rol.toLowerCase();
+
             document.getElementById("equipo-section").style.display = "none";
             document.getElementById("dashboard-section").style.display = "block";
 
             document.getElementById("user-display").innerText = data.usuario;
             document.getElementById("role-display").innerText = data.rol.toUpperCase();
 
-            // Configurar vistas e información del equipo correspondiente
             configurarVistasEquipo(equipoSeleccionado);
 
-            // CONTROL DE ROL: Solo si ingresa un Líder se activa la caja de subir archivos
-            const leaderPanel = document.getElementById("leader-panel");
-            if (leaderPanel) {
-                if (data.rol.toLowerCase() === "lider") {
-                    leaderPanel.style.display = "block";
-                } else {
-                    leaderPanel.style.display = "none";
-                }
-            }
+            // Control de paneles de líder
+            document.querySelectorAll('.leader-panel').forEach(panel => {
+                panel.style.display = (rolUsuario === "lider") ? "block" : "none";
+            });
 
-            cargarReporte();
+            // Cargar datos iniciales
+            cargarReporte('novedades');
+            cargarReporte('logueos');
+            cargarReporte('calidad');
+            cargarReporte('tmo');
         } else {
             alert("❌ Error: " + data.message);
         }
@@ -79,29 +80,27 @@ function validarAcceso(event) {
 function configurarVistasEquipo(equipo) {
     const labelEquipo = document.getElementById("team-info-label");
     const headerTitle = document.getElementById("info-title-header");
+    const btnNomina = document.getElementById("tab-btn-nomina");
 
-    // Ocultar todas las presentaciones activas
     document.querySelectorAll('.team-ppt').forEach(ppt => ppt.style.display = 'none');
 
-    // Cambiar texto de pestaña e iframe correspondiente
     if (equipo.includes("BAN")) {
         if (labelEquipo) labelEquipo.innerText = "Ban";
-        if (headerTitle) headerTitle.innerText = "Información del Ban / Novedades";
-        const pptBan = document.getElementById("ppt-bancau");
-        if (pptBan) pptBan.style.display = "block";
+        if (headerTitle) headerTitle.innerHTML = '<i class="fa-solid fa-circle-info"></i> Información del Ban / Novedades';
+        document.getElementById("ppt-bancau").style.display = "block";
+        if (btnNomina) btnNomina.style.display = "inline-block";
     } else if (equipo.includes("SAN JUAN")) {
         if (labelEquipo) labelEquipo.innerText = "San Juan";
-        if (headerTitle) headerTitle.innerText = "Información de Energía San Juan";
-        const pptSJ = document.getElementById("ppt-sanjuan");
-        if (pptSJ) pptSJ.style.display = "block";
+        if (headerTitle) headerTitle.innerHTML = '<i class="fa-solid fa-circle-info"></i> Información de Energía San Juan';
+        document.getElementById("ppt-sanjuan").style.display = "block";
+        if (btnNomina) btnNomina.style.display = "none";
     } else if (equipo.includes("NOA")) {
         if (labelEquipo) labelEquipo.innerText = "NOA";
-        if (headerTitle) headerTitle.innerText = "Información de NOA CAU";
-        const pptNoa = document.getElementById("ppt-noacau");
-        if (pptNoa) pptNoa.style.display = "block";
+        if (headerTitle) headerTitle.innerHTML = '<i class="fa-solid fa-circle-info"></i> Información de NOA CAU';
+        document.getElementById("ppt-noacau").style.display = "block";
+        if (btnNomina) btnNomina.style.display = "none";
     }
 
-    // Abrir siempre la primera pestaña (Info) por defecto
     showTab('info');
 }
 
@@ -116,28 +115,67 @@ function showTab(tabName) {
     if (targetBtn) targetBtn.classList.add('active');
 }
 
-function cargarReporte() {
-    const tableContainer = document.getElementById("table-container");
-    if (!tableContainer) return;
+// Control genérico de subpestañas (Calidad y TMO)
+function showSubTab(modulo, subTabName) {
+    const parentTab = document.getElementById('tab-' + modulo);
+    if (!parentTab) return;
 
-    tableContainer.innerHTML = "<p>Cargando información del equipo...</p>";
+    parentTab.querySelectorAll('.subtab-content').forEach(subTab => subTab.style.display = 'none');
+    parentTab.querySelectorAll('.subnav-tab').forEach(btn => btn.classList.remove('active'));
 
-    fetch("/obtener_reporte")
+    const targetSubTab = document.getElementById(`subtab-${modulo}-${subTabName}`) || document.getElementById(`subtab-${subTabName}`);
+    const targetSubBtn = document.getElementById(`subtab-btn-${subTabName}`) || document.getElementById(`subtab-btn-${modulo}-${subTabName}`);
+
+    if (targetSubTab) targetSubTab.style.display = 'block';
+    if (targetSubBtn) targetSubBtn.classList.add('active');
+}
+
+function cambiarPeriodoNovedades(periodo) {
+    cargarReporte('novedades', periodo);
+}
+
+function cambiarMes(tipoReporte, mes) {
+    cargarReporte(tipoReporte, mes);
+}
+
+function cargarReporte(tipoReporte, parametroFecha = null) {
+    let selectElem;
+    if (tipoReporte === 'novedades') {
+        selectElem = document.getElementById('select-periodo-novedades');
+    } else {
+        selectElem = document.getElementById(`select-mes-${tipoReporte}`);
+    }
+
+    const valorFecha = parametroFecha || (selectElem ? selectElem.value : "2026-10");
+
+    fetch(`/obtener_reporte?tipo=${tipoReporte}&fecha=${valorFecha}&equipo=${encodeURIComponent(equipoSeleccionado)}`)
     .then(response => response.json())
     .then(data => {
-        if (data.success && data.html_tabla) {
-            tableContainer.innerHTML = data.html_tabla;
-        } else {
-            tableContainer.innerHTML = "<p>No hay reportes cargados para este equipo aún.</p>";
+        // Cargar en los contenedores correspondientes
+        const containerGeneral = document.getElementById(`table-container-${tipoReporte}`);
+        if (containerGeneral && data.html_tabla) {
+            containerGeneral.innerHTML = data.html_tabla;
         }
     })
     .catch(() => {
-        tableContainer.innerHTML = "<p>Panel de reporte listo. Esperando carga de archivo por el Líder.</p>";
+        console.log(`Panel de ${tipoReporte} listo.`);
     });
 }
 
-function subirArchivo() {
-    const fileInput = document.getElementById("excelFile");
+function subirArchivo(tipoReporte) {
+    const inputIdMap = {
+        'novedades': 'excelFileNovedades',
+        'logueos': 'excelFileLogueos',
+        'calidad': 'excelFileCalidad',
+        'tmo': 'excelFileTmo'
+    };
+
+    const fileInput = document.getElementById(inputIdMap[tipoReporte]);
+    let selectElem = (tipoReporte === 'novedades') 
+        ? document.getElementById('select-periodo-novedades') 
+        : document.getElementById(`select-mes-${tipoReporte}`);
+
+    const valorFecha = selectElem ? selectElem.value : "";
 
     if (!fileInput || fileInput.files.length === 0) {
         alert("⚠️ Selecciona un archivo (.xlsx, .xls o .csv) antes de subir.");
@@ -146,6 +184,9 @@ function subirArchivo() {
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
+    formData.append("tipo", tipoReporte);
+    formData.append("fecha", valorFecha);
+    formData.append("equipo", equipoSeleccionado);
 
     fetch("/upload", {
         method: "POST",
@@ -156,7 +197,7 @@ function subirArchivo() {
         if (data.success) {
             alert("✅ " + data.message);
             fileInput.value = "";
-            cargarReporte();
+            cargarReporte(tipoReporte, valorFecha);
         } else {
             alert("❌ Error: " + data.message);
         }
