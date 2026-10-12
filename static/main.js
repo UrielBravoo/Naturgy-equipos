@@ -2,120 +2,178 @@ let equipoSeleccionado = "";
 
 function abrirLogin(nombreEquipo) {
     equipoSeleccionado = nombreEquipo;
-    document.getElementById("modalTitle").innerText = nombreEquipo === 'LIDER' ? 'Acceso Líderes' : 'Acceso ' + nombreEquipo;
-    document.getElementById("loginModal").style.display = "block";
+    const modalTitle = document.getElementById("modalTitle");
+    const loginModal = document.getElementById("loginModal");
+    
+    if (modalTitle) modalTitle.innerText = "Acceso a " + nombreEquipo;
+    if (loginModal) loginModal.style.display = "block";
+    
+    setTimeout(() => {
+        const userInput = document.getElementById("usuario");
+        if (userInput) userInput.focus();
+    }, 100);
 }
 
 function cerrarLogin() {
-    document.getElementById("loginModal").style.display = "none";
+    const loginModal = document.getElementById("loginModal");
+    if (loginModal) loginModal.style.display = "none";
     document.getElementById("usuario").value = "";
     document.getElementById("password").value = "";
 }
 
-async function validarAcceso(event) {
+function validarAcceso(event) {
     event.preventDefault();
-    const usuario = document.getElementById("usuario").value;
-    const pass = document.getElementById("password").value;
 
-    try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuario, password: pass, equipo: equipoSeleccionado })
-        });
+    const usuarioInput = document.getElementById("usuario").value.trim();
+    const passwordInput = document.getElementById("password").value.trim();
 
-        const data = await response.json();
+    if (!usuarioInput || !passwordInput) {
+        alert("Por favor completa el usuario y la contraseña.");
+        return;
+    }
 
-        if (response.ok && data.status === "success") {
+    fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            usuario: usuarioInput,
+            password: passwordInput,
+            equipo: equipoSeleccionado
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
             cerrarLogin();
-            mostrarDashboard(data.usuario, data.rol, data.equipo);
-            cargarTablaDatos();
+
+            document.getElementById("equipo-section").style.display = "none";
+            document.getElementById("dashboard-section").style.display = "block";
+
+            document.getElementById("user-display").innerText = data.usuario;
+            document.getElementById("role-display").innerText = data.rol.toUpperCase();
+
+            // Configurar vistas e información del equipo correspondiente
+            configurarVistasEquipo(equipoSeleccionado);
+
+            // CONTROL DE ROL: Solo si ingresa un Líder se activa la caja de subir archivos
+            const leaderPanel = document.getElementById("leader-panel");
+            if (leaderPanel) {
+                if (data.rol.toLowerCase() === "lider") {
+                    leaderPanel.style.display = "block";
+                } else {
+                    leaderPanel.style.display = "none";
+                }
+            }
+
+            cargarReporte();
         } else {
-            alert(data.mensaje || "Credenciales inválidas");
+            alert("❌ Error: " + data.message);
         }
-    } catch (err) {
-        alert("Error de conexión al servidor.");
-    }
+    })
+    .catch(error => {
+        console.error("Error en la autenticación:", error);
+        alert("❌ Error de comunicación al autenticar.");
+    });
 }
 
-function mostrarDashboard(usuario, rol, equipo) {
-    document.getElementById("equipo-section").style.display = "none";
-    document.getElementById("dashboard-section").style.display = "block";
+function configurarVistasEquipo(equipo) {
+    const labelEquipo = document.getElementById("team-info-label");
+    const headerTitle = document.getElementById("info-title-header");
 
-    document.getElementById("user-display").innerText = usuario;
-    document.getElementById("role-display").innerText = rol === 'lider' ? 'Líder (Edición/Carga)' : `Operador (${equipo})`;
+    // Ocultar todas las presentaciones activas
+    document.querySelectorAll('.team-ppt').forEach(ppt => ppt.style.display = 'none');
 
-    // Control de acceso: Ocultar panel de carga para operadores
-    if (rol === 'lider') {
-        document.getElementById("leader-panel").style.display = "block";
-    } else {
-        document.getElementById("leader-panel").style.display = "none";
+    // Cambiar texto de pestaña e iframe correspondiente
+    if (equipo.includes("BAN")) {
+        if (labelEquipo) labelEquipo.innerText = "Ban";
+        if (headerTitle) headerTitle.innerText = "Información del Ban / Novedades";
+        const pptBan = document.getElementById("ppt-bancau");
+        if (pptBan) pptBan.style.display = "block";
+    } else if (equipo.includes("SAN JUAN")) {
+        if (labelEquipo) labelEquipo.innerText = "San Juan";
+        if (headerTitle) headerTitle.innerText = "Información de Energía San Juan";
+        const pptSJ = document.getElementById("ppt-sanjuan");
+        if (pptSJ) pptSJ.style.display = "block";
+    } else if (equipo.includes("NOA")) {
+        if (labelEquipo) labelEquipo.innerText = "NOA";
+        if (headerTitle) headerTitle.innerText = "Información de NOA CAU";
+        const pptNoa = document.getElementById("ppt-noacau");
+        if (pptNoa) pptNoa.style.display = "block";
     }
+
+    // Abrir siempre la primera pestaña (Info) por defecto
+    showTab('info');
 }
 
-async function cargarTablaDatos() {
-    const container = document.getElementById("table-container");
-    container.innerHTML = "<p>Cargando registros...</p>";
+function showTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+    document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
 
-    try {
-        const res = await fetch('/get-data');
-        const data = await res.json();
+    const targetTab = document.getElementById('tab-' + tabName);
+    const targetBtn = document.getElementById('tab-btn-' + tabName);
 
-        if (data.status === "ok" && data.datos.length > 0) {
-            let html = "<table><thead><tr>";
-            data.columnas.forEach(col => {
-                html += `<th>${col}</th>`;
-            });
-            html += "</tr></thead><tbody>";
+    if (targetTab) targetTab.style.display = 'block';
+    if (targetBtn) targetBtn.classList.add('active');
+}
 
-            data.datos.forEach(row => {
-                html += "<tr>";
-                data.columnas.forEach(col => {
-                    html += `<td>${row[col] || ''}</td>`;
-                });
-                html += "</tr>";
-            });
+function cargarReporte() {
+    const tableContainer = document.getElementById("table-container");
+    if (!tableContainer) return;
 
-            html += "</tbody></table>";
-            container.innerHTML = html;
+    tableContainer.innerHTML = "<p>Cargando información del equipo...</p>";
+
+    fetch("/obtener_reporte")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.html_tabla) {
+            tableContainer.innerHTML = data.html_tabla;
         } else {
-            container.innerHTML = "<p>No hay registros disponibles para mostrar.</p>";
+            tableContainer.innerHTML = "<p>No hay reportes cargados para este equipo aún.</p>";
         }
-    } catch (e) {
-        container.innerHTML = "<p>Error al cargar el reporte.</p>";
-    }
+    })
+    .catch(() => {
+        tableContainer.innerHTML = "<p>Panel de reporte listo. Esperando carga de archivo por el Líder.</p>";
+    });
 }
 
-async function subirArchivo() {
+function subirArchivo() {
     const fileInput = document.getElementById("excelFile");
-    if (!fileInput.files || fileInput.files.length === 0) {
-        alert("Por favor selecciona un archivo Excel o CSV.");
+
+    if (!fileInput || fileInput.files.length === 0) {
+        alert("⚠️ Selecciona un archivo (.xlsx, .xls o .csv) antes de subir.");
         return;
     }
 
     const formData = new FormData();
-    formData.append("file", fileInput.files);
+    formData.append("file", fileInput.files[0]);
 
-    try {
-        const response = await fetch('/upload-excel', {
-            method: 'POST',
-            body: formData
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert("¡Archivo subido y procesado correctamente!");
-            cargarTablaDatos();
+    fetch("/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ " + data.message);
+            fileInput.value = "";
+            cargarReporte();
         } else {
-            alert(result.error || "Error al subir el archivo.");
+            alert("❌ Error: " + data.message);
         }
-    } catch (err) {
-        alert("Error en la solicitud de carga.");
-    }
+    })
+    .catch(error => {
+        console.error("Error al subir archivo:", error);
+        alert("❌ Error de comunicación al subir el archivo.");
+    });
 }
 
 function cerrarSesion() {
-    fetch('/logout', { method: 'POST' }).then(() => {
+    fetch("/logout", { method: "POST" })
+    .then(() => {
+        document.getElementById("dashboard-section").style.display = "none";
+        document.getElementById("equipo-section").style.display = "flex";
+    })
+    .catch(() => {
         document.getElementById("dashboard-section").style.display = "none";
         document.getElementById("equipo-section").style.display = "flex";
     });

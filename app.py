@@ -1,95 +1,112 @@
 import os
 import pandas as pd
-from flask import Flask, render_template, request, jsonify, session, send_from_directory
-from dotenv import load_dotenv
-from scripts.procesar_excel import procesar_logueos_orion
+from flask import Flask, render_template, request, jsonify, session
 
-load_dotenv()
+app = Flask(__name__)
+app.secret_key = 'clave_secreta_para_sesiones_cat'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
-app.secret_key = os.getenv('SECRET_KEY', 'clave_secreta_naturgy_2026')
+reporte_activo = {
+    'html_tabla': None,
+    'total_registros': 0,
+    'nombre_archivo': ''
+}
 
-# Configuración de base de usuarios leyendo desde .env
-def obtener_usuarios():
-    return {
-        os.getenv('USUARIO_EQUIPO_BAN_CAU'): {"pass": os.getenv('PASS_EQUIPO_BAN_CAU'), "rol": "operador", "equipo": "NATURGY BAN CAU"},
-        os.getenv('USUARIO_EQUIPO_NOA_CAU'): {"pass": os.getenv('PASS_EQUIPO_NOA_CAU'), "rol": "operador", "equipo": "NATURGY NOA CAU"},
-        os.getenv('USUARIO_EQUIPO_SAN_JUAN'): {"pass": os.getenv('PASS_EQUIPO_SAN_JUAN'), "rol": "operador", "equipo": "NATURGY ENERGIA SAN JUAN"},
-        os.getenv('USUARIO_LIDER_1'): {"pass": os.getenv('PASS_LIDER_1'), "rol": "lider", "equipo": "TODOS"},
-        os.getenv('USUARIO_LIDER_2'): {"pass": os.getenv('PASS_LIDER_2'), "rol": "lider", "equipo": "TODOS"}
-    }
+USUARIOS = {
+    # Operadores por equipo
+    'operador_bancau': {'password': 'BanCau2026*', 'rol': 'agente', 'equipo': 'BAN CAU'},
+    'operador_noacau': {'password': 'NoaCau2026*', 'rol': 'agente', 'equipo': 'NOA CAU'},
+    'operador_sanjuan': {'password': 'SanJuan2026*', 'rol': 'agente', 'equipo': 'ENERGIA SAN JUAN'},
+    
+    # Líderes (Tienen permisos de carga en cualquier equipo)
+    'kparra': {'password': 'admin2026', 'rol': 'lider', 'equipo': 'TODOS'},
+    'lherrera': {'password': 'admin2026', 'rol': 'lider', 'equipo': 'TODOS'}
+}
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Servir archivos estáticos de la carpeta assets (Logos)
-@app.route('/assets/<path:filename>')
-def serve_assets(filename):
-    return send_from_directory('assets', filename)
-
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json() or {}
-    usuario = data.get('usuario')
-    password = data.get('password')
-    equipo = data.get('equipo')
+    usuario = data.get('usuario', '').strip()
+    password = data.get('password', '').strip()
 
-    users_db = obtener_usuarios()
-    user_info = users_db.get(usuario)
-
-    if user_info and user_info['pass'] == password:
-        # Si es operador, validar que pertenezca al equipo seleccionado o sea líder
-        if user_info['rol'] == 'operador' and user_info['equipo'] != equipo:
-            return jsonify({"status": "error", "mensaje": f"El usuario no tiene permiso para el equipo {equipo}"}), 403
-
+    if usuario in USUARIOS and USUARIOS[usuario]['password'] == password:
         session['usuario'] = usuario
-        session['rol'] = user_info['rol']
-        session['equipo'] = equipo if user_info['rol'] == 'operador' else 'TODOS'
-
+        session['rol'] = USUARIOS[usuario]['rol']
         return jsonify({
-            "status": "success",
-            "rol": user_info['rol'],
-            "equipo": session['equipo'],
-            "usuario": usuario
+            'success': True,
+            'usuario': usuario,
+            'rol': USUARIOS[usuario]['rol']
         })
-
-    return jsonify({"status": "error", "mensaje": "Usuario o contraseña incorrectos"}), 401
-
-@app.route('/get-data', methods=['GET'])
-def get_data():
-    if 'usuario' not in session:
-        return jsonify({"error": "No autorizado"}), 401
-
-    # Busca primero el archivo subido o usa el CSV original de logueos
-    ruta_csv = 'uploads/ultimo_reporte.xlsx'
-    if not os.path.exists(ruta_csv):
-        ruta_csv = 'Logueos Naturgy BAN CAU SEPT-OCT(Log Oct).csv'
-
-    resultado = procesar_logueos_orion(ruta_csv)
-    return jsonify(resultado)
-
-@app.route('/upload-excel', methods=['POST'])
-def upload_excel():
-    # Permiso exclusivo para Líderes
-    if session.get('rol') != 'lider':
-        return jsonify({"error": "Acceso denegado. Permiso exclusivo para Líderes."}), 403
-
-    if 'file' not in request.files:
-        return jsonify({"error": "No se subió ningún archivo"}), 400
-
-    file = request.files['file']
-    os.makedirs('uploads', exist_ok=True)
-    filepath = os.path.join('uploads', 'ultimo_reporte.xlsx')
-    file.save(filepath)
-
-    resultado = procesar_logueos_orion(filepath)
-    return jsonify({"status": "success", "mensaje": "Archivo cargado y procesado exitosamente", "detalles": resultado})
+    
+    return jsonify({
+        'success': False,
+        'message': 'Usuario o contraseña incorrectos.'
+    }), 401
 
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return jsonify({"status": "success"})
+    return jsonify({'success': True})
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    global reporte_activo
+
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'message': 'No se envió ningún archivo.'}), 400
+
+    file = request.files['file']
+    filename = file.filename
+
+    if not filename:
+        return jsonify({'success': False, 'message': 'Nombre de archivo no válido.'}), 400
+
+    ext = os.path.splitext(filename)[1].lower()
+
+    try:
+        if ext in ['.xls', '.xlsx']:
+            df = pd.read_excel(file)
+        elif ext == '.csv':
+            try:
+                df = pd.read_csv(file, encoding='utf-8')
+            except UnicodeDecodeError:
+                df = pd.read_csv(file, encoding='latin-1', sep=None, engine='python')
+        else:
+            return jsonify({'success': False, 'message': 'Formato no soportado.'}), 400
+
+        df = df.dropna(how='all')
+        tabla_html = df.to_html(classes="tabla-logueos-estilo", index=False, border=0)
+
+        reporte_activo['html_tabla'] = tabla_html
+        reporte_activo['total_registros'] = len(df)
+        reporte_activo['nombre_archivo'] = filename
+
+        return jsonify({
+            'success': True,
+            'message': f"Archivo '{filename}' procesado con éxito. Total registros: {len(df)}",
+            'total': len(df),
+            'html_tabla': tabla_html
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f"Error: {str(e)}"}), 500
+
+@app.route('/obtener_reporte', methods=['GET'])
+def obtener_reporte():
+    global reporte_activo
+    if reporte_activo['html_tabla']:
+        return jsonify({
+            'success': True,
+            'html_tabla': reporte_activo['html_tabla'],
+            'total': reporte_activo['total_registros'],
+            'archivo': reporte_activo['nombre_archivo']
+        })
+    
+    return jsonify({'success': False, 'message': 'No hay reportes cargados aún.'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

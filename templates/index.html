@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Logueos y Asistencia - CAT</title>
     
-    <!-- Importación de tipografía Montserrat desde Google Fonts -->
+    <!-- Importación de tipografía Josefin Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Hoja de estilos vinculada mediante Flask -->
@@ -13,7 +13,6 @@
 </head>
 <body>
 
-    <!-- Cabecera con fondo negro y únicamente el logo de CAT a la izquierda -->
     <header class="main-header">
         <div class="logo-left-container">
             <img src="{{ url_for('static', filename='CAT.png') }}" alt="Logo CAT" class="logo-cat-large">
@@ -23,64 +22,87 @@
     </header>
 
     <main class="container">
-        <!-- Selección de Equipos (San Juan ubicado en el centro entre BAN y NOA) -->
+        <!-- Selección de Equipos (3 Campañas) -->
         <section id="equipo-section" class="equipos-grid">
             <!-- 1. NATURGY BAN CAU -->
             <div class="card-equipo" onclick="abrirLogin('NATURGY BAN CAU')">
                 <h2>NATURGY BAN CAU</h2>
-                <p>Acceso solo lectura para operadores</p>
-                <button class="btn-card">Ingresar</button>
+                <p>Acceso para Operadores y Líderes</p>
+                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY BAN CAU');">INGRESAR</button>
             </div>
 
-            <!-- 2. NATURGY ENERGIA SAN JUAN (Centro) -->
+            <!-- 2. NATURGY ENERGIA SAN JUAN -->
             <div class="card-equipo" onclick="abrirLogin('NATURGY ENERGIA SAN JUAN')">
                 <h2>NATURGY ENERGIA SAN JUAN</h2>
-                <p>Acceso solo lectura para operadores</p>
-                <button class="btn-card">Ingresar</button>
+                <p>Acceso para Operadores y Líderes</p>
+                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY ENERGIA SAN JUAN');">INGRESAR</button>
             </div>
 
             <!-- 3. NATURGY NOA CAU -->
             <div class="card-equipo" onclick="abrirLogin('NATURGY NOA CAU')">
                 <h2>NATURGY NOA CAU</h2>
-                <p>Acceso solo lectura para operadores</p>
-                <button class="btn-card">Ingresar</button>
-            </div>
-
-            <!-- 4. Acceso Líderes -->
-            <div class="card-equipo card-lider" onclick="abrirLogin('LIDER')">
-                <h2>Acceso Líderes</h2>
-                <p>Modificación y gestión de reportes Excel</p>
-                <button class="btn-card btn-lider">Acceso Gestión</button>
+                <p>Acceso para Operadores y Líderes</p>
+                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY NOA CAU');">INGRESAR</button>
             </div>
         </section>
 
-        <!-- Panel del Usuario Autenticado (Post Login) -->
+        <!-- Dashboard Post-Login -->
         <section id="dashboard-section" style="display: none;">
             <div class="user-bar">
                 <p>Usuario: <strong id="user-display"></strong> | Rol: <span id="role-display" class="badge"></span></p>
                 <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
             </div>
 
-            <!-- Panel exclusivo de carga para Líderes -->
-            <div id="leader-panel" style="display: none;" class="panel-box">
-                <h3>Cargar Nuevo Reporte de Logueos (Orion / Excel)</h3>
-                <div class="upload-group">
-                    <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
-                    <button onclick="subirArchivo()" class="btn-ingresar">Subir y Procesar Archivo</button>
+            <!-- Menú de Pestañas (Info abre primero) -->
+            <nav class="team-navigation">
+                <button type="button" id="tab-btn-info" class="nav-tab active" onclick="showTab('info')">📢 Info <span id="team-info-label">Equipo</span></button>
+                <button type="button" id="tab-btn-logueos" class="nav-tab" onclick="showTab('logueos')">📊 Reporte Logueos</button>
+            </nav>
+
+            <!-- Pestaña 1: Info / Presentación por Campaña -->
+            <div id="tab-info" class="tab-content">
+                <div class="panel-box">
+                    <h3 id="info-title-header">Información y Novedades</h3>
+                    
+                    <!-- Presentación BAN CAU -->
+                    <div id="ppt-bancau" class="ppt-viewer team-ppt" style="display: none;">
+                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXvwwRNs8/HhYMcTWKdey1NQEEBDMCsA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+                    </div>
+
+                    <!-- Presentación SAN JUAN -->
+                    <div id="ppt-sanjuan" class="ppt-viewer team-ppt" style="display: none;">
+                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXwZUnr0k/JvD_ZzvuYPamtZx-xmNVXA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+                    </div>
+
+                    <!-- Presentación NOA CAU -->
+                    <div id="ppt-noacau" class="ppt-viewer team-ppt" style="display: none;">
+                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXwQ2dCFQ/tFmXhbv0Zhq2woI_AlnmkA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+                    </div>
                 </div>
             </div>
 
-            <!-- Vista del Reporte Activo -->
-            <div id="data-panel" class="panel-box">
-                <h3>Reporte Activo de Logueos</h3>
-                <div id="table-container" class="table-responsive">
-                    <p>Cargando registros del equipo...</p>
+            <!-- Pestaña 2: Logueos de Asistencia -->
+            <div id="tab-logueos" class="tab-content" style="display: none;">
+                <!-- Panel exclusivo de carga (SOLO VISIBLE PARA LÍDERES) -->
+                <div id="leader-panel" style="display: none;" class="panel-box">
+                    <h3>Cargar Nuevo Reporte de Logueos (Orion / Excel)</h3>
+                    <div class="upload-group">
+                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
+                        <button type="button" onclick="subirArchivo()" class="btn-ingresar">Subir y Procesar Archivo</button>
+                    </div>
+                </div>
+
+                <div id="data-panel" class="panel-box">
+                    <h3>Reporte Activo de Logueos</h3>
+                    <div id="table-container" class="table-responsive">
+                        <p>Cargando registros del equipo...</p>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Modal de Inicio de Sesión -->
+    <!-- Modal Login -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="cerrarLogin()">&times;</span>
@@ -97,6 +119,7 @@
         </div>
     </div>
 
-    <!-- Script principal vinculado mediante Flask -->
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <!-- Script JS con versión forzada -->
+    <script src="{{ url_for('static', filename='main.js') }}?v=7.0"></script>
 </body>
+</html>
