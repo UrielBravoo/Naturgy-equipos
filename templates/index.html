@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Logueos - Naturgy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Panel de Control de Asistencias y Turnos - Naturgy</h1>
+        <div id="userInfo" class="user-info" style="display: none;">
+            <span>Usuario: <strong id="lblUsuario"></strong> (<span id="lblRol"></span>)</span>
+            <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Sección de Login -->
+        <section id="loginSection" class="card">
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="usuario">Usuario:</label>
+                    <input type="text" id="usuario" required placeholder="Ej: operador_bancau">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary">Ingresar</button>
+            </form>
+            <p id="loginError" class="error-msg"></p>
+        </section>
+
+        <!-- Sección Principal (Subida y Tabla) -->
+        <section id="appSection" style="display: none;">
+            <section class="card upload-section">
+                <h2>Subir Reporte de Orion</h2>
+                <div class="upload-box">
+                    <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+                    <button onclick="procesarArchivo()" class="btn-success">Cargar y Actualizar</button>
+                </div>
+                <p id="uploadStatus" class="status-msg"></p>
+            </section>
+
+            <section class="card tabla-container">
+                <h2>Métricas por Equipo</h2>
+                <div id="tablaContent">
+                    <p>Selecciona un archivo Excel o CSV para visualizar las métricas.</p>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <!-- Importación del script de JavaScript desde static -->
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

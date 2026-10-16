@@ -1,0 +1,100 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+header {
+    background-color: #0056b3;
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+}
+
+h1 { font-size: 1.5rem; }
+h2 { margin-bottom: 1rem; color: #0056b3; }
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.btn-primary { background-color: #0056b3; color: white; width: 100%; }
+.btn-success { background-color: #28a745; color: white; }
+.btn-logout { background-color: #dc3545; color: white; margin-left: 1rem; }
+
+.upload-box {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.error-msg { color: red; margin-top: 1rem; }
+.status-msg { margin-top: 0.5rem; font-weight: bold; }
+
+/* Estilos de la tabla procesada por Pandas */
+.tabla-container {
+    overflow-x: auto;
+}
+
+.tabla-logueos-estilo {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.tabla-logueos-estilo th, .tabla-logueos-estilo td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.tabla-logueos-estilo th {
+    background-color: #0056b3;
+    color: white;
+}
+
+.tabla-logueos-estilo tr:nth-child(even) {
+    background-color: #f2f2f2;
+}

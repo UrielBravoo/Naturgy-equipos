@@ -1,0 +1,5 @@
+operador_bancau,BanCau2026*,agente,BAN CAU
+operador_noacau,NoaCau2026*,agente,NOA CAU
+operador_sanjuan,SanJuan2026*,agente,ENERGIA SAN JUAN
+kparra,admin2026,lider,TODOS
+lherrera,admin2026,lider,TODOS
