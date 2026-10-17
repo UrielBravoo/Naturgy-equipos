@@ -55,26 +55,8 @@ Usuario
 Contraseña
 Rol
 Equipo Asignado
-kparra
-admin2026
-Líder
-TODOS (Acceso Global)
-lherrera
-admin2026
-Líder
-TODOS (Acceso Global)
-operador_bancau
-BanCau2026*
-Operador
-NATURGY BAN CAU
-operador_noacau
-NoaCau2026*
-Operador
-NATURGY NOA CAU
-operador_sanjuan
-SanJuan2026*
-Operador
-NATURGY ENERGIA SAN JUAN
+Lideres
+
 ⚙️ Instalación y Ejecución Local
 Clonar el repositorio:
 git clone https://github.com/karyparrauni/Naturgy-equipos.git
@@ -83,7 +65,9 @@ Instalar dependencias necesarias:
 pip install flask pandas openpyxl xlrd
 Iniciar el servidor web:
 python app.py
-Acceder desde el navegador: Navega a http://127.0.0.1:5000
+
+Acceder desde el navegador: Navega a http://127.0.0.1:
+
 🌿 Estructura de Ramas Git
 El desarrollo del proyecto está organizado en las siguientes ramas:
 main: Código consolidado y estable listo para producción.
