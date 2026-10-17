@@ -1,23 +1,132 @@
 let equipoSeleccionado = "";
-let rolUsuario = "";
+
+// Enlaces oficiales de Canva por equipo
+const CANVA_URLS = {
+    "NATURGY ENERGIA SAN JUAN": "https://www.canva.com/design/DAHXwZUnr0k/JvD_ZzvuYPamtZx-xmNVXA/view?embed",
+    "NATURGY BAN CAU": "https://www.canva.com/design/DAHXvwwRNs8/HhYMcTWKdey1NQEEBDMCsA/view?embed",
+    "NATURGY NOA CAU": "https://www.canva.com/design/DAHXwQ2dCFQ/tFmXhbv0Zhq2woI_AlnmkA/view?embed"
+};
+
+// Carga de la Nómina con "Líder:"
+function cargarNomina(equipo) {
+    const container = document.getElementById("nomina-container");
+    if (!container) return;
+
+    if (equipo === "NATURGY BAN CAU") {
+        container.innerHTML = `
+            <div class="nomina-header">
+                <img src="/static/naturgy.png" alt="Logo Naturgy" class="logo-naturgy" onerror="this.style.display='none'">
+                <h2>Nómina Oficial - Naturgy BAN CAU</h2>
+            </div>
+
+            <div class="nomina-grid">
+                <!-- Nómina Karina Parra -->
+                <div class="nomina-card">
+                    <div class="supervisor-title">
+                        <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Líder: Karina Parra
+                    </div>
+                    <table class="tabla-nomina">
+                        <thead>
+                            <tr>
+                                <th>Legajo</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>Turno</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>22432</td><td>Escobar</td><td>Ariana Lucia</td><td><span class="badge-turno tt">TT</span></td></tr>
+                            <tr><td>20436</td><td>Herbas</td><td>Alejandra</td><td><span class="badge-turno tt">TT</span></td></tr>
+                            <tr><td>21740</td><td>Quintana</td><td>Melisa</td><td><span class="badge-turno tm">TM</span></td></tr>
+                            <tr><td>22438</td><td>Rios</td><td>Gian Franco Gabriel</td><td><span class="badge-turno tm">TM</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Nómina Leila Herrera -->
+                <div class="nomina-card">
+                    <div class="supervisor-title">
+                        <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Líder: Leila Herrera
+                    </div>
+                    <table class="tabla-nomina">
+                        <thead>
+                            <tr>
+                                <th>Legajo</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>Turno</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>22434</td><td>Ganino</td><td>Luciano Ian</td><td><span class="badge-turno tm">TM</span></td></tr>
+                            <tr><td>22439</td><td>Arce</td><td>Candela</td><td><span class="badge-turno tm">TM</span></td></tr>
+                            <tr><td>22440</td><td>Rios</td><td>Axel Rodrigo</td><td><span class="badge-turno tm">TM</span></td></tr>
+                            <tr><td>22441</td><td>Ruiz Dominguez</td><td>Florencia Azul</td><td><span class="badge-turno tt">TT</span></td></tr>
+                            <tr><td>22442</td><td>Garcia</td><td>Victoria Maria</td><td><span class="badge-turno tt">TT</span></td></tr>
+                            <tr><td>23827</td><td>Gonzalez</td><td>Vanesa</td><td><span class="badge-turno tm">TM</span></td></tr>
+                            <tr><td>23759</td><td>Bogado Barreto</td><td>Nadia Noemi</td><td><span class="badge-turno tm">TM</span></td></tr>
+                            <tr><td>311198</td><td>Gonzalez</td><td>Sandra</td><td><span class="badge-turno tm">TM</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="placeholder-box">
+                <p>Nómina de personal para <strong>${equipo}</strong> en proceso de carga.</p>
+            </div>
+        `;
+    }
+}
+
+// Función ejecutada al cambiar el mes en Logueos, Calidad o Métricas
+function cambiarMes(pestana, valorMes) {
+    console.log(`Cambio de mes en la pestaña ${pestana}: ${valorMes}`);
+    if (pestana === 'logueos') {
+        cargarReporte();
+    }
+}
+
+function cambiarPestana(nombrePestana, event) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    const tabTarget = document.getElementById('tab-' + nombrePestana);
+    if (tabTarget) {
+        tabTarget.classList.add('active');
+    }
+
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+}
+
+function cargarInfoCampana(equipo) {
+    const container = document.getElementById("canva-container");
+    const title = document.getElementById("campana-title");
+    
+    const urlCanva = CANVA_URLS[equipo] || CANVA_URLS["NATURGY BAN CAU"];
+    title.innerText = "📢 Información de Campaña - " + equipo;
+    
+    container.innerHTML = `
+        <div class="canva-responsive-wrapper">
+            <iframe loading="lazy" src="${urlCanva}" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+        </div>
+    `;
+}
 
 function abrirLogin(nombreEquipo) {
     equipoSeleccionado = nombreEquipo;
-    const modalTitle = document.getElementById("modalTitle");
-    const loginModal = document.getElementById("loginModal");
-    
-    if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Acceso a ' + nombreEquipo;
-    if (loginModal) loginModal.style.display = "block";
-    
-    setTimeout(() => {
-        const userInput = document.getElementById("usuario");
-        if (userInput) userInput.focus();
-    }, 100);
+    document.getElementById("modalTitle").innerText = "Acceso a " + nombreEquipo;
+    document.getElementById("loginModal").style.display = "block";
+    document.getElementById("usuario").focus();
 }
 
 function cerrarLogin() {
-    const loginModal = document.getElementById("loginModal");
-    if (loginModal) loginModal.style.display = "none";
+    document.getElementById("loginModal").style.display = "none";
     document.getElementById("usuario").value = "";
     document.getElementById("password").value = "";
 }
@@ -35,7 +144,9 @@ function validarAcceso(event) {
 
     fetch("/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             usuario: usuarioInput,
             password: passwordInput,
@@ -47,146 +158,68 @@ function validarAcceso(event) {
         if (data.success) {
             cerrarLogin();
 
-            rolUsuario = data.rol.toLowerCase();
-
             document.getElementById("equipo-section").style.display = "none";
             document.getElementById("dashboard-section").style.display = "block";
 
             document.getElementById("user-display").innerText = data.usuario;
+            document.getElementById("team-display").innerText = data.equipo;
             document.getElementById("role-display").innerText = data.rol.toUpperCase();
 
-            configurarVistasEquipo(equipoSeleccionado);
+            const leaderPanel = document.getElementById("leader-panel");
+            if (data.rol === "lider") {
+                leaderPanel.style.display = "block";
+            } else {
+                leaderPanel.style.display = "none";
+            }
 
-            // Control de paneles de líder
-            document.querySelectorAll('.leader-panel').forEach(panel => {
-                panel.style.display = (rolUsuario === "lider") ? "block" : "none";
-            });
+            const firstTabBtn = document.querySelector('.tab-btn');
+            cambiarPestana('nomina', { currentTarget: firstTabBtn });
 
-            // Cargar datos iniciales
-            cargarReporte('novedades');
-            cargarReporte('logueos');
-            cargarReporte('calidad');
-            cargarReporte('tmo');
+            cargarNomina(data.equipo);
+            cargarReporte();
+            cargarInfoCampana(data.equipo);
+
         } else {
             alert("❌ Error: " + data.message);
         }
     })
     .catch(error => {
         console.error("Error en la autenticación:", error);
-        alert("❌ Error de comunicación al autenticar.");
+        alert("❌ Ocurrió un error de red al intentar iniciar sesión.");
     });
 }
 
-function configurarVistasEquipo(equipo) {
-    const labelEquipo = document.getElementById("team-info-label");
-    const headerTitle = document.getElementById("info-title-header");
-    const btnNomina = document.getElementById("tab-btn-nomina");
+function cargarReporte() {
+    const tableContainer = document.getElementById("table-container");
+    if (!tableContainer) return;
 
-    document.querySelectorAll('.team-ppt').forEach(ppt => ppt.style.display = 'none');
+    tableContainer.innerHTML = "<p>Cargando información de logueos del equipo...</p>";
 
-    if (equipo.includes("BAN")) {
-        if (labelEquipo) labelEquipo.innerText = "Ban";
-        if (headerTitle) headerTitle.innerHTML = '<i class="fa-solid fa-circle-info"></i> Información del Ban / Novedades';
-        document.getElementById("ppt-bancau").style.display = "block";
-        if (btnNomina) btnNomina.style.display = "inline-block";
-    } else if (equipo.includes("SAN JUAN")) {
-        if (labelEquipo) labelEquipo.innerText = "San Juan";
-        if (headerTitle) headerTitle.innerHTML = '<i class="fa-solid fa-circle-info"></i> Información de Energía San Juan';
-        document.getElementById("ppt-sanjuan").style.display = "block";
-        if (btnNomina) btnNomina.style.display = "none";
-    } else if (equipo.includes("NOA")) {
-        if (labelEquipo) labelEquipo.innerText = "NOA";
-        if (headerTitle) headerTitle.innerHTML = '<i class="fa-solid fa-circle-info"></i> Información de NOA CAU';
-        document.getElementById("ppt-noacau").style.display = "block";
-        if (btnNomina) btnNomina.style.display = "none";
-    }
-
-    showTab('info');
-}
-
-function showTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-    document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
-
-    const targetTab = document.getElementById('tab-' + tabName);
-    const targetBtn = document.getElementById('tab-btn-' + tabName);
-
-    if (targetTab) targetTab.style.display = 'block';
-    if (targetBtn) targetBtn.classList.add('active');
-}
-
-// Control genérico de subpestañas (Calidad y TMO)
-function showSubTab(modulo, subTabName) {
-    const parentTab = document.getElementById('tab-' + modulo);
-    if (!parentTab) return;
-
-    parentTab.querySelectorAll('.subtab-content').forEach(subTab => subTab.style.display = 'none');
-    parentTab.querySelectorAll('.subnav-tab').forEach(btn => btn.classList.remove('active'));
-
-    const targetSubTab = document.getElementById(`subtab-${modulo}-${subTabName}`) || document.getElementById(`subtab-${subTabName}`);
-    const targetSubBtn = document.getElementById(`subtab-btn-${subTabName}`) || document.getElementById(`subtab-btn-${modulo}-${subTabName}`);
-
-    if (targetSubTab) targetSubTab.style.display = 'block';
-    if (targetSubBtn) targetSubBtn.classList.add('active');
-}
-
-function cambiarPeriodoNovedades(periodo) {
-    cargarReporte('novedades', periodo);
-}
-
-function cambiarMes(tipoReporte, mes) {
-    cargarReporte(tipoReporte, mes);
-}
-
-function cargarReporte(tipoReporte, parametroFecha = null) {
-    let selectElem;
-    if (tipoReporte === 'novedades') {
-        selectElem = document.getElementById('select-periodo-novedades');
-    } else {
-        selectElem = document.getElementById(`select-mes-${tipoReporte}`);
-    }
-
-    const valorFecha = parametroFecha || (selectElem ? selectElem.value : "2026-10");
-
-    fetch(`/obtener_reporte?tipo=${tipoReporte}&fecha=${valorFecha}&equipo=${encodeURIComponent(equipoSeleccionado)}`)
+    fetch("/obtener_reporte")
     .then(response => response.json())
     .then(data => {
-        // Cargar en los contenedores correspondientes
-        const containerGeneral = document.getElementById(`table-container-${tipoReporte}`);
-        if (containerGeneral && data.html_tabla) {
-            containerGeneral.innerHTML = data.html_tabla;
+        if (data.success && data.html_tabla) {
+            tableContainer.innerHTML = data.html_tabla;
+        } else {
+            tableContainer.innerHTML = `<p>${data.message || "No hay reportes cargados aún para este equipo."}</p>`;
         }
     })
-    .catch(() => {
-        console.log(`Panel de ${tipoReporte} listo.`);
+    .catch(error => {
+        console.error("Error al obtener el reporte:", error);
+        tableContainer.innerHTML = "<p>Ocurrió un error al cargar la información.</p>";
     });
 }
 
-function subirArchivo(tipoReporte) {
-    const inputIdMap = {
-        'novedades': 'excelFileNovedades',
-        'logueos': 'excelFileLogueos',
-        'calidad': 'excelFileCalidad',
-        'tmo': 'excelFileTmo'
-    };
-
-    const fileInput = document.getElementById(inputIdMap[tipoReporte]);
-    let selectElem = (tipoReporte === 'novedades') 
-        ? document.getElementById('select-periodo-novedades') 
-        : document.getElementById(`select-mes-${tipoReporte}`);
-
-    const valorFecha = selectElem ? selectElem.value : "";
+function subirArchivo() {
+    const fileInput = document.getElementById("excelFile");
 
     if (!fileInput || fileInput.files.length === 0) {
-        alert("⚠️ Selecciona un archivo (.xlsx, .xls o .csv) antes de subir.");
+        alert("⚠️ Por favor selecciona un archivo (.xlsx, .xls o .csv) antes de presionar subir.");
         return;
     }
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
-    formData.append("tipo", tipoReporte);
-    formData.append("fecha", valorFecha);
-    formData.append("equipo", equipoSeleccionado);
 
     fetch("/upload", {
         method: "POST",
@@ -197,14 +230,14 @@ function subirArchivo(tipoReporte) {
         if (data.success) {
             alert("✅ " + data.message);
             fileInput.value = "";
-            cargarReporte(tipoReporte, valorFecha);
+            cargarReporte();
         } else {
             alert("❌ Error: " + data.message);
         }
     })
     .catch(error => {
         console.error("Error al subir archivo:", error);
-        alert("❌ Error de comunicación al subir el archivo.");
+        alert("❌ Error de comunicación al intentar subir el archivo.");
     });
 }
 
@@ -213,8 +246,10 @@ function cerrarSesion() {
     .then(() => {
         document.getElementById("dashboard-section").style.display = "none";
         document.getElementById("equipo-section").style.display = "flex";
+        alert("Sesión cerrada correctamente.");
     })
-    .catch(() => {
+    .catch(error => {
+        console.error("Error al cerrar sesión:", error);
         document.getElementById("dashboard-section").style.display = "none";
         document.getElementById("equipo-section").style.display = "flex";
     });

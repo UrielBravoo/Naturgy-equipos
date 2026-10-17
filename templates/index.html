@@ -3,300 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Logueos y Asistencia - CAT</title>
-    
-    <!-- Tipografía Josefin Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Hoja de estilos -->
+    <title>Naturgy - Gestión de Reportes y Equipos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
+    <!-- Cabecera Principal -->
     <header class="main-header">
         <div class="logo-left-container">
             <img src="{{ url_for('static', filename='CAT.png') }}" alt="Logo CAT" class="logo-cat-large">
         </div>
-        <h1 class="header-title">Control<br>de<br>Logueos y Asistencia</h1>
-        <p class="header-subtitle">Plataforma de gestión por equipos</p>
+        <h1 class="header-title">Naturgy - Gestión de Reportes</h1>
+        <p class="header-subtitle">Automatización, Control Operativo y Centro de Información</p>
     </header>
 
     <main class="container">
-        <!-- Selección de Equipos (3 Campañas) -->
-        <section id="equipo-section" class="equipos-grid">
-            <div class="card-equipo" onclick="abrirLogin('NATURGY BAN CAU')">
-                <h2>NATURGY BAN CAU</h2>
-                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY BAN CAU');">
-                    <i class="fa-solid fa-right-to-bracket"></i> INGRESAR
-                </button>
-            </div>
 
-            <div class="card-equipo" onclick="abrirLogin('NATURGY ENERGIA SAN JUAN')">
-                <h2>NATURGY ENERGIA SAN JUAN</h2>
-                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY ENERGIA SAN JUAN');">
-                    <i class="fa-solid fa-right-to-bracket"></i> INGRESAR
-                </button>
-            </div>
+        <!-- 1. SECCIÓN DE TARJETAS DE EQUIPOS -->
+        <section id="equipo-section">
+            <div class="equipos-grid">
 
-            <div class="card-equipo" onclick="abrirLogin('NATURGY NOA CAU')">
-                <h2>NATURGY NOA CAU</h2>
-                <button type="button" class="btn-card" onclick="event.stopPropagation(); abrirLogin('NATURGY NOA CAU');">
-                    <i class="fa-solid fa-right-to-bracket"></i> INGRESAR
-                </button>
+                <div class="card-equipo">
+                    <h2>Naturgy BAN CAU</h2>
+                    <p>Acceso a reportes, información operativa y logueos de BAN CAU.</p>
+                    <button class="btn-card" onclick="abrirLogin('NATURGY BAN CAU')">Ingresar</button>
+                </div>
+
+                <div class="card-equipo">
+                    <h2>Naturgy San Juan</h2>
+                    <p>Acceso a reportes, información operativa y logueos de Energía San Juan.</p>
+                    <button class="btn-card" onclick="abrirLogin('NATURGY ENERGIA SAN JUAN')">Ingresar</button>
+                </div>
+
+                <div class="card-equipo">
+                    <h2>Naturgy NOA CAU</h2>
+                    <p>Acceso a reportes, información operativa y logueos de NOA CAU.</p>
+                    <button class="btn-card" onclick="abrirLogin('NATURGY NOA CAU')">Ingresar</button>
+                </div>
+
+                <div class="card-equipo card-lider">
+                    <h2>Panel de Líderes</h2>
+                    <p>Gestión global, actualización y administración general.</p>
+                    <button class="btn-card btn-lider" onclick="abrirLogin('LIDER')">Acceso Líder</button>
+                </div>
+
             </div>
         </section>
 
-        <!-- Dashboard Post-Login -->
+        <!-- 2. DASHBOARD PRINCIPAL DE EQUIPO -->
         <section id="dashboard-section" style="display: none;">
+            
+            <!-- Barra superior del usuario autenticado -->
             <div class="user-bar">
-                <p><i class="fa-solid fa-user-circle"></i> Usuario: <strong id="user-display"></strong> | Rol: <span id="role-display" class="badge"></span></p>
-                <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</button>
+                <div>
+                    <strong>Usuario:</strong> <span id="user-display">---</span> 
+                    | <strong>Equipo:</strong> <span id="team-display">---</span>
+                    | <strong>Rol:</strong> <span id="role-display" class="badge">---</span>
+                </div>
+                <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
 
-            <!-- Menú de Pestañas Principal -->
-            <nav class="team-navigation">
-                <button type="button" id="tab-btn-info" class="nav-tab active" onclick="showTab('info')">
-                    <i class="fa-solid fa-bullhorn"></i> Info <span id="team-info-label">Equipo</span>
+            <!-- Navegación por Pestañas -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="cambiarPestana('nomina', event)">
+                    <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    Nómina
                 </button>
-                <button type="button" id="tab-btn-nomina" class="nav-tab" onclick="showTab('nomina')" style="display: none;">
-                    <i class="fa-solid fa-users-gear"></i> Nómina
+                <button class="tab-btn" onclick="cambiarPestana('campana', event)">
+                    <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    Info Campaña
                 </button>
-                <button type="button" id="tab-btn-novedades" class="nav-tab" onclick="showTab('novedades')">
-                    <i class="fa-solid fa-bell-concierge"></i> Novedades
+                <button class="tab-btn" onclick="cambiarPestana('logueos', event)">
+                    <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    Logueos
                 </button>
-                <button type="button" id="tab-btn-logueos" class="nav-tab" onclick="showTab('logueos')">
-                    <i class="fa-solid fa-chart-user"></i> Logueos
+                <button class="tab-btn" onclick="cambiarPestana('novedades', event)">
+                    <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    Novedades
                 </button>
-                <button type="button" id="tab-btn-calidad" class="nav-tab" onclick="showTab('calidad')">
-                    <i class="fa-solid fa-award"></i> Calidad
+                <button class="tab-btn" onclick="cambiarPestana('calidad', event)">
+                    <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    Calidad
                 </button>
-                <button type="button" id="tab-btn-tmo" class="nav-tab" onclick="showTab('tmo')">
-                    <i class="fa-solid fa-stopwatch"></i> TMO
+                <button class="tab-btn" onclick="cambiarPestana('metricas', event)">
+                    <svg class="tab-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v7zm4 0h-2v-4h2v4z"/></svg>
+                    Métricas
                 </button>
-            </nav>
+            </div>
 
-            <!-- Pestaña 1: Info -->
-            <div id="tab-info" class="tab-content">
+            <!-- CONTENIDO DE PESTAÑAS -->
+
+            <!-- PESTAÑA 1: NÓMINA -->
+            <div id="tab-nomina" class="tab-content active">
                 <div class="panel-box">
-                    <h3 id="info-title-header"><i class="fa-solid fa-circle-info"></i> Información y Novedades</h3>
-                    
-                    <div id="ppt-bancau" class="ppt-viewer team-ppt" style="display: none;">
-                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXvwwRNs8/HhYMcTWKdey1NQEEBDMCsA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
-                    </div>
-
-                    <div id="ppt-sanjuan" class="ppt-viewer team-ppt" style="display: none;">
-                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXwZUnr0k/JvD_ZzvuYPamtZx-xmNVXA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
-                    </div>
-
-                    <div id="ppt-noacau" class="ppt-viewer team-ppt" style="display: none;">
-                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXwQ2dCFQ/tFmXhbv0Zhq2woI_AlnmkA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+                    <div id="nomina-container">
+                        <p>Selecciona un equipo para consultar su nómina.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Pestaña 2: Nómina -->
-            <div id="tab-nomina" class="tab-content" style="display: none;">
+            <!-- PESTAÑA 2: INFO CAMPAÑA (CANVA EMBED) -->
+            <div id="tab-campana" class="tab-content">
                 <div class="panel-box">
-                    <h3><i class="fa-solid fa-address-card"></i> Nómina Asesores BAN CAU</h3>
-                    <div class="ppt-viewer">
-                        <iframe loading="lazy" src="https://www.canva.com/design/DAHXwXa6qco/DngI62F7ebdBQTboxVj9_A/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
-                    </div>
+                    <h3 id="campana-title">📢 Información de Campaña</h3>
+                    <div id="canva-container"></div>
                 </div>
             </div>
 
-            <!-- Pestaña 3: Novedades -->
-            <div id="tab-novedades" class="tab-content" style="display: none;">
-                <div class="filter-bar panel-box">
-                    <label for="select-periodo-novedades"><i class="fa-solid fa-calendar-days"></i> Seleccionar Período:</label>
-                    <select id="select-periodo-novedades" onchange="cambiarPeriodoNovedades(this.value)">
-                        <option value="sept-oct">Septiembre - Octubre</option>
-                        <option value="oct-nov">Octubre - Noviembre</option>
-                        <option value="nov-dic">Noviembre - Diciembre</option>
-                    </select>
-                </div>
-
-                <div id="leader-panel-novedades" style="display: none;" class="panel-box leader-panel">
-                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de Novedades (Excel)</h3>
-                    <div class="upload-group">
-                        <input type="file" id="excelFileNovedades" accept=".xlsx, .xls, .csv">
-                        <button type="button" onclick="subirArchivo('novedades')" class="btn-ingresar">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
-                        </button>
+            <!-- PESTAÑA 3: LOGUEOS -->
+            <div id="tab-logueos" class="tab-content">
+                <div id="leader-panel" class="panel-box" style="display: none;">
+                    <h3>📤 Cargar Reporte de Asesor (Excel / CSV)</h3>
+                    <p>Sube las planillas para actualizar el consolidado de logueos:</p>
+                    <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
+                        <button class="btn-card btn-lider" onclick="subirArchivo()">Subir Reporte</button>
                     </div>
                 </div>
 
                 <div class="panel-box">
-                    <h3><i class="fa-solid fa-table-list"></i> Reporte de Novedades</h3>
-                    <div id="table-container-novedades" class="table-responsive">
-                        <p>Cargando registros de novedades para el período seleccionado...</p>
+                    <div class="panel-header-filter">
+                        <h3>⏱️ Horarios de Logueo y Asistencia Consolidada</h3>
+                        <div class="filter-group">
+                            <label for="select-mes-logueos"><strong>Mes:</strong></label>
+                            <select id="select-mes-logueos" class="select-mes" onchange="cambiarMes('logueos', this.value)">
+                                <option value="2026-10" selected>Octubre 2026</option>
+                                <option value="2026-11">Noviembre 2026</option>
+                                <option value="2026-12">Diciembre 2026</option>
+                                <option value="2027-01">Enero 2027</option>
+                                <option value="2027-02">Febrero 2027</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="table-container" class="table-responsive">
+                        <p>Cargando información del equipo...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Pestaña 4: Logueos -->
-            <div id="tab-logueos" class="tab-content" style="display: none;">
-                <div class="filter-bar panel-box">
-                    <label for="select-mes-logueos"><i class="fa-solid fa-calendar-check"></i> Seleccionar Mes:</label>
-                    <select id="select-mes-logueos" onchange="cambiarMes('logueos', this.value)">
-                        <option value="2026-10">Octubre 2026</option>
-                        <option value="2026-11">Noviembre 2026</option>
-                        <option value="2026-12">Diciembre 2026</option>
-                    </select>
-                </div>
-
-                <div id="leader-panel-logueos" style="display: none;" class="panel-box leader-panel">
-                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de Logueos (Orion / Excel)</h3>
-                    <div class="upload-group">
-                        <input type="file" id="excelFileLogueos" accept=".xlsx, .xls, .csv">
-                        <button type="button" onclick="subirArchivo('logueos')" class="btn-ingresar">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
-                        </button>
-                    </div>
-                </div>
-
+            <!-- PESTAÑA 4: NOVEDADES -->
+            <div id="tab-novedades" class="tab-content">
                 <div class="panel-box">
-                    <h3><i class="fa-solid fa-clipboard-user"></i> Reporte de Logueos</h3>
-                    <div id="table-container-logueos" class="table-responsive">
-                        <p>Cargando registros del mes seleccionado...</p>
+                    <h3>📋 Registro de Novedades e Incidencias</h3>
+                    <p>Novedades operativas, licencias, cambios de turno y avisos importantes.</p>
+                    <div class="placeholder-box">
+                        <p>No hay novedades registradas recientemente para este equipo.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Pestaña 5: Calidad -->
-            <div id="tab-calidad" class="tab-content" style="display: none;">
-                <div class="filter-bar panel-box">
-                    <label for="select-mes-calidad"><i class="fa-solid fa-calendar-check"></i> Seleccionar Mes:</label>
-                    <select id="select-mes-calidad" onchange="cambiarMes('calidad', this.value)">
-                        <option value="2026-10">Octubre 2026</option>
-                        <option value="2026-11">Noviembre 2026</option>
-                        <option value="2026-12">Diciembre 2026</option>
-                    </select>
-                </div>
-
-                <div class="subnav-container">
-                    <button type="button" id="subtab-btn-glosario" class="subnav-tab active" onclick="showSubTab('calidad', 'glosario')">
-                        <i class="fa-solid fa-spell-check"></i> Glosario
-                    </button>
-                    <button type="button" id="subtab-btn-monitoreos" class="subnav-tab" onclick="showSubTab('calidad', 'monitoreos')">
-                        <i class="fa-solid fa-headset"></i> Detalle Monitoreos
-                    </button>
-                    <button type="button" id="subtab-btn-resumen" class="subnav-tab" onclick="showSubTab('calidad', 'resumen')">
-                        <i class="fa-solid fa-square-poll-vertical"></i> Resumen
-                    </button>
-                </div>
-
-                <div id="leader-panel-calidad" style="display: none;" class="panel-box leader-panel">
-                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de Calidad (Excel)</h3>
-                    <div class="upload-group">
-                        <input type="file" id="excelFileCalidad" accept=".xlsx, .xls, .csv">
-                        <button type="button" onclick="subirArchivo('calidad')" class="btn-ingresar">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
-                        </button>
+            <!-- PESTAÑA 5: CALIDAD -->
+            <div id="tab-calidad" class="tab-content">
+                <div class="panel-box">
+                    <div class="panel-header-filter">
+                        <h3>🎯 Control y Evaluaciones de Calidad</h3>
+                        <div class="filter-group">
+                            <label for="select-mes-calidad"><strong>Mes:</strong></label>
+                            <select id="select-mes-calidad" class="select-mes" onchange="cambiarMes('calidad', this.value)">
+                                <option value="2026-10" selected>Octubre 2026</option>
+                                <option value="2026-11">Noviembre 2026</option>
+                                <option value="2026-12">Diciembre 2026</option>
+                                <option value="2027-01">Enero 2027</option>
+                                <option value="2027-02">Febrero 2027</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-
-                <div id="subtab-calidad-glosario" class="subtab-content panel-box">
-                    <h3><i class="fa-solid fa-book-bookmark"></i> Glosario de Calidad</h3>
-                    <div id="table-container-calidad-glosario" class="table-responsive">
-                        <p>Información de glosario y términos de calidad...</p>
-                    </div>
-                </div>
-
-                <div id="subtab-calidad-monitoreos" class="subtab-content panel-box" style="display: none;">
-                    <h3><i class="fa-solid fa-list-check"></i> Detalle de Monitoreos</h3>
-                    <div id="table-container-calidad-monitoreos" class="table-responsive">
-                        <p>Cargando monitoreos detallados del mes...</p>
-                    </div>
-                </div>
-
-                <div id="subtab-calidad-resumen" class="subtab-content panel-box" style="display: none;">
-                    <h3><i class="fa-solid fa-chart-line"></i> Resumen de Calidad</h3>
-                    <div id="table-container-calidad-resumen" class="table-responsive">
-                        <p>Cargando métricas de resumen...</p>
+                    <div class="placeholder-box">
+                        <p>Módulo de Calidad listo para consultar evaluaciones del periodo seleccionado.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Pestaña 6: TMO -->
-            <div id="tab-tmo" class="tab-content" style="display: none;">
-                <div class="filter-bar panel-box">
-                    <label for="select-mes-tmo"><i class="fa-solid fa-calendar-check"></i> Seleccionar Mes:</label>
-                    <select id="select-mes-tmo" onchange="cambiarMes('tmo', this.value)">
-                        <option value="2026-10">Octubre 2026</option>
-                        <option value="2026-11">Noviembre 2026</option>
-                        <option value="2026-12">Diciembre 2026</option>
-                    </select>
-                </div>
-
-                <!-- Subpestañas TMO con el mismo estilo de Calidad -->
-                <div class="subnav-container">
-                    <button type="button" id="subtab-btn-tmo-general" class="subnav-tab active" onclick="showSubTab('tmo', 'general')">
-                        <i class="fa-solid fa-clock"></i> General TMO
-                    </button>
-                    <button type="button" id="subtab-btn-tmo-metricas" class="subnav-tab" onclick="showSubTab('tmo', 'metricas')">
-                        <i class="fa-solid fa-chart-column"></i> Métricas por Asesor
-                    </button>
-                    <button type="button" id="subtab-btn-tmo-detalle" class="subnav-tab" onclick="showSubTab('tmo', 'detalle')">
-                        <i class="fa-solid fa-list-ol"></i> Detalle de Llamadas
-                    </button>
-                </div>
-
-                <div id="leader-panel-tmo" style="display: none;" class="panel-box leader-panel">
-                    <h3><i class="fa-solid fa-file-arrow-up"></i> Cargar Reporte de TMO (Excel)</h3>
-                    <div class="upload-group">
-                        <input type="file" id="excelFileTmo" accept=".xlsx, .xls, .csv">
-                        <button type="button" onclick="subirArchivo('tmo')" class="btn-ingresar">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Subir y Procesar Archivo
-                        </button>
+            <!-- PESTAÑA 6: MÉTRICAS -->
+            <div id="tab-metricas" class="tab-content">
+                <div class="panel-box">
+                    <div class="panel-header-filter">
+                        <h3>📈 Indicadores y Métricas Operativas (KPIs)</h3>
+                        <div class="filter-group">
+                            <label for="select-mes-metricas"><strong>Mes:</strong></label>
+                            <select id="select-mes-metricas" class="select-mes" onchange="cambiarMes('metricas', this.value)">
+                                <option value="2026-10" selected>Octubre 2026</option>
+                                <option value="2026-11">Noviembre 2026</option>
+                                <option value="2026-12">Diciembre 2026</option>
+                                <option value="2027-01">Enero 2027</option>
+                                <option value="2027-02">Febrero 2027</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-
-                <div id="subtab-tmo-general" class="subtab-content panel-box">
-                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Reporte General de TMO</h3>
-                    <div id="table-container-tmo-general" class="table-responsive">
-                        <p>Cargando registros generales de TMO...</p>
-                    </div>
-                </div>
-
-                <div id="subtab-tmo-metricas" class="subtab-content panel-box" style="display: none;">
-                    <h3><i class="fa-solid fa-users-viewfinder"></i> Métricas de TMO por Asesor</h3>
-                    <div id="table-container-tmo-metricas" class="table-responsive">
-                        <p>Cargando métricas del equipo...</p>
-                    </div>
-                </div>
-
-                <div id="subtab-tmo-detalle" class="subtab-content panel-box" style="display: none;">
-                    <h3><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Detalle de Llamadas TMO</h3>
-                    <div id="table-container-tmo-detalle" class="table-responsive">
-                        <p>Cargando detalle de llamadas...</p>
+                    <div class="placeholder-box">
+                        <p>Estadísticas e indicadores KPIs disponibles para el periodo seleccionado.</p>
                     </div>
                 </div>
             </div>
+
         </section>
+
     </main>
 
-    <!-- Modal Login -->
+    <!-- 3. MODAL DE LOGIN -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="cerrarLogin()">&times;</span>
-            <h2 id="modalTitle"><i class="fa-solid fa-shield-halved"></i> Acceso a Equipo</h2>
+            <h2 id="modalTitle">Acceso a Equipo</h2>
+            
             <form onsubmit="validarAcceso(event)">
-                <label for="usuario">Usuario:</label>
-                <input type="text" id="usuario" placeholder="Ej: operador_bancau / kparra" required autocomplete="off">
+                <div style="margin-bottom: 12px;">
+                    <label for="usuario">Usuario:</label>
+                    <input type="text" id="usuario" placeholder="Ingresa tu usuario" required autocomplete="username">
+                </div>
 
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" required>
+                <div style="margin-bottom: 20px;">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+                </div>
 
-                <button type="submit" class="btn-ingresar">
-                    <i class="fa-solid fa-key"></i> Iniciar Sesión
-                </button>
+                <button type="submit" class="btn-ingresar">Ingresar</button>
             </form>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='main.js') }}?v=12.0"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
